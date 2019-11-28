@@ -88,20 +88,3 @@
 # 修改用户：只能修改用户姓名
 # 删除用户
 # 保证程序完整
-users = {}
-print('欢迎来到XXX银行系统')
-while True:
-    flage = int(input('1.注册 2.登录 3.查询所有用户 4.修改用户 5.删除用户 6.退出  '))
-    if flage == 1:
-        num = input('请输入卡号：')
-        if(num in users):
-            print('卡号重复！')
-        else:
-            name = input('请输入姓名：')
-            password = input('请输入密码：')
-            users[num] = {'姓名':name,'密码':password,'余额':0.0}
-    elif flage == 2:
-        pass
-    elif flage == 6:
-        break
-print(users)
