@@ -8,6 +8,7 @@ sock, addr=server.accept()
 data = ""
 while True:
     tmp_data = sock.recv(1024)
+    print(str(tmp_data))
     if tmp_data:
         data += tmp_data.decode("utf8")
     else:
