@@ -75,6 +75,31 @@ def parse_topic(url):
         topic.jtl = float(jtl)
         topic.save()
 
+    for answer_item in all_divs[1:]:
+        answer = Answer()
+        answer.topic_id = topic_id
+        author_info = answer_item.xpath('.//div[@class="nick_name"]//a[1]/@href').extract()[0]
+        author_id = author_info.split("/")[-1]
+        answer.author = author_id
+        create_time_str = answer_item.xpath('.//label[@class="date_time"]/text()').extract()[0]
+        create_time = datetime.strptime(create_time_str, "%Y-%m-%d %H:%M:%S")
+        answer.create_time = create_time
+        parised_nums_str = answer_item.xpath('.//label[@class="red_praise digg"]//em/text()').extract()[0]
+        answer.parised_nums = int(parised_nums_str)
+        content = answer_item.xpath('.//div[@class="post_body post_body_min_h"]').extract()[0]
+        answer.content = content
+        answer.save()
+
+    # 把有分页的数据，就是第2,3.。。。。页的数据 全部获取出来也保存到数据库
+
+def parse_anthor(url):
+    # 获取用户的详情
+    author_id = url.split("/")[-1]
+    rest_text = get_html(url)
+    sel = Selector(text=rest_text)
+    name = sel.xpath('//p[@class="lt_title"]/text()').extract()[-1].strip()
+    pass
+
 def parse_list(url):
     rest_text = get_html(url)
     sel = Selector(text=rest_text)
@@ -111,7 +136,8 @@ def parse_list(url):
         else:
             topic.save(force_insert=True)
 
-        parse_topic(topic_url)
+        # parse_topic(topic_url)
+        parse_anthor("https:" + author_url)
 
 if __name__ == "__main__":
     last_urls = get_last_urls()
