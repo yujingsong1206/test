@@ -98,7 +98,35 @@ def parse_anthor(url):
     rest_text = get_html(url)
     sel = Selector(text=rest_text)
     name = sel.xpath('//p[@class="lt_title"]/text()').extract()[-1].strip()
-    pass
+    desc = sel.xpath('//div[@class="description clearfix"]/p/text()').extract()[0].strip()
+    follower_nums_str = sel.xpath('//div[@class="fans"]/a/span/text()').extract()[0].strip()
+    following_nums_str = sel.xpath('//div[@class="att"]/a/span/text()').extract()[0].strip()
+    follower_nums = 0
+    following_nums = 0
+    if "k" in follower_nums_str:
+        jtl_match = re.search("(\d+)", follower_nums_str)
+        follower_nums = int(float(jtl_match.group(1)) * 1000)
+    else:
+        follower_nums = int(follower_nums_str)
+    if "k" in following_nums_str:
+        jtl_match = re.search("(\d+)", following_nums_str)
+        following_nums = int(float(jtl_match.group(1)) * 1000)
+    else:
+        following_nums = int(following_nums_str)
+
+    author = Author()
+    author.id = author_id
+    author.name = name
+    author.desc = desc
+    author.follower_nums = follower_nums
+    author.following_nums = following_nums
+
+    existed_author = Author.select().where(Author.id == author_id)
+    if existed_author:
+        author.save()
+    else:
+        author.save(force_insert=True)
+
 
 def parse_list(url):
     rest_text = get_html(url)
@@ -136,9 +164,10 @@ def parse_list(url):
         else:
             topic.save(force_insert=True)
 
-        # parse_topic(topic_url)
+        parse_topic(topic_url)
         parse_anthor("https:" + author_url)
 
 if __name__ == "__main__":
-    last_urls = get_last_urls()
-    parse_list(last_urls[0])
+    # last_urls = get_last_urls()
+    # parse_list(last_urls[0])
+    parse_anthor("https://me.csdn.net/csdnbbs2018")
